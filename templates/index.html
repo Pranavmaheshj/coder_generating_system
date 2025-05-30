@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CodeLlama Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>CodeLlama Code Generator</h1>
+        
+        <form id="codeForm">
+            <div class="form-group">
+                <label>Describe what you want to code:</label>
+                <textarea id="prompt" required placeholder="E.g., a Python function to calculate factorial"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Language:</label>
+                <select id="language">
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="java">Java</option>
+                    <option value="c++">C++</option>
+                </select>
+            </div>
+            
+            <button type="submit">Generate Code</button>
+            <div id="loading" style="display: none;">Generating... (First run may take a while)</div>
+        </form>
+        
+        <div class="result">
+            <h3>Generated Code:</h3>
+            <pre id="output">Your code will appear here</pre>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('codeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const prompt = document.getElementById('prompt').value;
+            const language = document.getElementById('language').value;
+            
+            const output = document.getElementById('output');
+            const loading = document.getElementById('loading');
+            const submitBtn = document.querySelector('button[type="submit"]');
+            
+            loading.style.display = 'block';
+            submitBtn.disabled = true;
+            output.textContent = '';
+            
+            try {
+                const response = await fetch(
+                    `/generate?prompt=${encodeURIComponent(prompt)}&language=${language}`
+                );
+                const data = await response.json();
+                
+                if (data.status === "success") {
+                    output.textContent = data.code;
+                } else {
+                    output.textContent = `Error: ${data.message}`;
+                }
+            } catch (error) {
+                output.textContent = `Network error: ${error.message}`;
+            } finally {
+                loading.style
